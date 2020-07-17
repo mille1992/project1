@@ -2,7 +2,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Welcome Page
+    Registration Page
 {% endblock %}
 
 {% block heading %}    
@@ -12,15 +12,13 @@
 {% endblock %}
 
 {% block body %}    
-    <p class="pt-2 text-center">Please login</p>
+    <p class="pt-2 text-center">Please type in your favorite username and password</p>
     
-    <form class="text-center" action="{{ url_for('login')}}" method="POST">
+    <form class="text-center" action="{{ url_for('registration')}}" method="POST">
         <input type="text" name="username" placeholder="Enter your Name">
         <input type="password" name="password" placeholder="Enter your password">
         <button>Submit</button>
     </form>
-    
-    <p class="pt-2 text-center">No Account? <a href="{{ url_for('registration') }}">Register here</a> 
-    </p>
+
 
 {% endblock %}
