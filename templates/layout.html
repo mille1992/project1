@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    </head>
+    <body>
+        <header>
+            <img src="src/Project0_Diving_header.jpg" class="img-fluid" alt="Diving header">
+            
+            <nav class="navbar navbar-expand-md fixed-left navbar-dark" style="background-color:#000000;">
+                <div class="navbar" id="navbarDivingMain">
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="index.html">Home <span class="sr-only"></span></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <h1>
+            {% block heading %}
+            {% endblock %}
+        </h1>
+
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>
