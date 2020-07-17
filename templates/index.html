@@ -2,15 +2,24 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Welcome Page
+    Welcome Page
 {% endblock %}
 
 {% block heading %}    
-    Welcome to Bookuru!
+    
+    {{mainHeading}}
 
 {% endblock %}
 
 {% block body %}    
-    <p> some text </p>
+    <p class="pt-2 text-center">Please login</p>
+    
+    <form class="text-center" action="{{ url_for('login')}}" method="post">
+        <input type="text" name="username" placeholder="Enter your Name">
+        <input type="password" name="password" placeholder="Enter your password">
+        <button>Submit</button>
+    </form>
+    
+    <p class="pt-2 text-center">No Account? Register here</p>
 
 {% endblock %}

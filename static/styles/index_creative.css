@@ -1,0 +1,21 @@
+body, html {
+    height: 100%;
+  }
+.bg {
+    /* The image used */
+    background-image: url("../static/bookuruHeader_1.jpg");
+  
+    /* Full height */
+    height: 100%;
+  
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.centerWebpageTitle{
+    padding-top: 14%;
+    text-align: center;
+    padding-left: 2%;
+    font-size: 38px;
+}
