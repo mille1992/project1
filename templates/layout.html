@@ -8,18 +8,20 @@
 
     </head>
     <body>
-        <header>     
-            <nav class="navbar navbar-expand-md fixed-left navbar-dark" style="background-color:#000000;">
-                <div class="navbar" id="navbarDivingMain">
-                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <header style="background-color: #000000">
+            <h1 class="text-center" style="background-color:#000000; font-size: 46px; color: #b4e6ff;">Bookuru</h1>    
+            <nav class="navbar navbar-expand-md fixed-left navbar-dark" style="background-color:#000000">
+                <div class="navbar">
+                    <ul class="navbar-nav">
                         <li class="nav-item active">
                             <a class="nav-link" href="{{url_for('index')}}">Home</a>
                         </li>
                     </ul>
                 </div>
             </nav>
-            <p class="text-right mr-auto mt-2" style="padding-right: 2%;">{{loggedInUserTxt}}</p>
         </header>
+        <p class="text-right mr-auto mt-2" style="padding-right: 2%;">{{loggedInUserTxt}}</p>
+
 
         <h1 class="pt-4 text-center">
             {% block heading %}
