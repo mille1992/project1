@@ -20,6 +20,7 @@ Session(app)
 
 # Set up database on hekoru
 engine = create_engine(os.getenv("DATABASE_URL"))
+
 # make sure user sessions are seperated from another if happening at the same time
 db = scoped_session(sessionmaker(bind=engine))
 
@@ -41,16 +42,19 @@ def index():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-
+        # check whether password and username can be found in the database
         if db.execute("SELECT * FROM users WHERE username = :username AND password = :password", {"username":username, "password":password}).rowcount == 0:
             mainHeading = "Username or Password not found. Please try again."
             return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
+        # welcome user, if password and username can be found
         else:
             mainHeading = f"Welcome, {username}"
             loggedInUserTxt = f"Logged in as: {username}"
             return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt) 
-
-    # When user is not logged in yet
+    # When user is not logged in yet or already logged in and accesses the home screen
+    
+    
+    # !! not working properly yet. Sessions need to be included here !!
     else:
         if username ==  "defaultUser":
             return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
@@ -58,6 +62,7 @@ def index():
             mainHeading = f"Welcome, {username}"
             loggedInUserTxt = f"Logged in as: {username}"
             return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt) 
+
 
 
 
@@ -69,12 +74,13 @@ def registration():
         username = request.form.get("username")
         password = request.form.get("password")
         print(f"password: {password}", file=sys.stderr)
+
         # create new user object and assign username and password to it
         user = User(username = username, password = password)
 
-        # check if password was provided
-        if password == "" or password is None:
-            mainHeading = f"Please enter a password as well"
+        # check if password and username were provided
+        if password == "" or password is None or username == "" or username is None:
+            mainHeading = f"Please enter a password and username"
             return render_template("registration.html", mainHeading = mainHeading)
 
         # check if username already exists
@@ -92,6 +98,10 @@ def registration():
         mainHeading = "Please register here"
         return render_template("registration.html", mainHeading = mainHeading)
 
+
+
+
+
 @app.route("/login", methods =["POST"])
 def login():
     username = "defaultUser"
@@ -99,10 +109,6 @@ def login():
     username = request.form.get("username")
     password = request.form.get("password")
     mainHeading = f"Welcome,  {username} . Thanks for logging in!"
-
-    # ----- check whether username and password are part of the db -----
-    # ...
-    # -------------
 
     if username == "defaultUser":
         loggedInUserTxt = "Not logged in yet"
