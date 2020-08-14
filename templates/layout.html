@@ -5,7 +5,6 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="../static/styles/background.css">
-
     </head>
     <body>
         <header style="background-color: #000000">
@@ -20,7 +19,12 @@
                 </div>
             </nav>
         </header>
-        <p class="text-right mr-auto mt-2" style="padding-right: 2%;">{{loggedInUserTxt}}</p>
+        <p class="text-right mr-auto mt-2" style="padding-right: 2%;">
+            {{loggedInUserTxt}}
+        </p>
+        <p class="text-right mr-auto mt-2" style="padding-right: 2%;">
+            <a href="{{url_for('logout')}}">Logout</a>
+        </p>
 
 
         <h1 class="pt-4 text-center">

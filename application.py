@@ -1,11 +1,12 @@
 import os
 import sys
 
-from flask import Flask, session, render_template, request
+from flask import Flask, session, render_template, request, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from classes import *
+from uuid import uuid4
 
 app = Flask(__name__)
 
@@ -30,39 +31,34 @@ db = scoped_session(sessionmaker(bind=engine))
 @app.route("/", methods=["GET","POST"])
 def index():
     mainHeading = "Welcome to Bookuru!"
-    username = "defaultUser"
-
-    # display text which user is logged in
-    if username == "defaultUser":
-        loggedInUserTxt = ""
-    else:
-        loggedInUserTxt = f"Logged in as: {username}"
 
     # When user tries to login
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        session['username'] = username
+        session['usernumber'] = uuid4()
+
         # check whether password and username can be found in the database
         if db.execute("SELECT * FROM users WHERE username = :username AND password = :password", {"username":username, "password":password}).rowcount == 0:
             mainHeading = "Username or Password not found. Please try again."
+            loggedInUserTxt = ""
             return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
+
         # welcome user, if password and username can be found
         else:
-            mainHeading = f"Welcome, {username}"
+            username = username
+            mainHeading = f"Welcome, {username}!"
             loggedInUserTxt = f"Logged in as: {username}"
             return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt) 
-    # When user is not logged in yet or already logged in and accesses the home screen
-    
-    
-    # !! not working properly yet. Sessions need to be included here !!
     else:
-        if username ==  "defaultUser":
-            return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
+        if session.get('username') == None: # user click home button / enters webpage without being logged in
+            mainHeading = "Welcome to Bookuru! Please login."
+            return render_template("index.html", mainHeading = mainHeading)
         else:
-            mainHeading = f"Welcome, {username}"
-            loggedInUserTxt = f"Logged in as: {username}"
-            return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt) 
-
+            mainHeading = f"Find your book" # user clicks home button / enters webpage while being logged in
+            loggedInUserTxt = f"Logged in as: {session['username']}"
+            return render_template("bookSearch.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
 
 
 
@@ -100,24 +96,20 @@ def registration():
 
 
 
+@app.route("/bookDetails", methods=["GET", "POST"])
+def bookDetails():
+    loggedInUserTxt = f"Logged in as: {session['username']}"
+    mainHeading = "Here are the detailed information about your book:"
+    bookTitle = request.form.get("bookTitle")
+    bookAuthor = request.form.get("bookAuthor")
+    bookISBN = request.form.get("bookISBN")
+    return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookTitle = bookTitle, bookAuthor = bookAuthor, bookISBN = bookISBN)
 
-
-@app.route("/login", methods =["POST"])
-def login():
-    username = "defaultUser"
-
-    username = request.form.get("username")
-    password = request.form.get("password")
-    mainHeading = f"Welcome,  {username} . Thanks for logging in!"
-
-    if username == "defaultUser":
-        loggedInUserTxt = "Not logged in yet"
+@app.route("/logout")
+def logout():
+    if session.get('username') is None:
+        return redirect(url_for('index'))
     else:
-        loggedInUserTxt = f"Logged in as: {username}"
-
-    return render_template("login.html", mainHeading = mainHeading, username = username, password = password, loggedInUserTxt = loggedInUserTxt)
-
-@app.route("/bookSearch")
-def bookSearch():
-    mainHeading = "Look up your next book"
-    return render_template("bookSearch.html", mainHeading = mainHeading)
+        session.clear()
+        mainHeading = "You are logged out, now. Do you wan to log in again?"
+        return render_template('index.html', mainHeading = mainHeading)

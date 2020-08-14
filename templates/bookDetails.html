@@ -1,0 +1,23 @@
+
+{% extends "layout.html" %}
+
+{% block title %}
+    Find your book
+{% endblock %}
+
+{% block heading %}    
+    
+    {{mainHeading}}
+
+{% endblock %}
+
+{% block body %}    
+    <p class="pt-2 text-center">This is your book</p>
+    <p class="pt-2 text-center"></p>
+        Book title: {{bookTitle}}
+        Book author: {{bookAuthor}}
+        Book ISBN: {{bookISBN}}
+    </p>
+
+
+{% endblock %}
