@@ -19,7 +19,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Set up database on hekoru
+# Set up database on heroku
 engine = create_engine(os.getenv("DATABASE_URL"))
 
 # make sure user sessions are seperated from another if happening at the same time
@@ -52,7 +52,7 @@ def index():
             loggedInUserTxt = f"Logged in as: {username}"
             return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt) 
     else:
-        if session.get('username') == None: # user click home button / enters webpage without being logged in
+        if session.get('username') == None: # user clicks home button / enters webpage without being logged in
             mainHeading = "Welcome to Bookuru! Please login."
             return render_template("index.html", mainHeading = mainHeading)
         else:
@@ -94,17 +94,7 @@ def registration():
         mainHeading = "Please register here"
         return render_template("registration.html", mainHeading = mainHeading)
 
-
-
-@app.route("/bookDetails", methods=["GET", "POST"])
-def bookDetails():
-    loggedInUserTxt = f"Logged in as: {session['username']}"
-    mainHeading = "Here are the detailed information about your book:"
-    bookTitle = request.form.get("bookTitle")
-    bookAuthor = request.form.get("bookAuthor")
-    bookISBN = request.form.get("bookISBN")
-    return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookTitle = bookTitle, bookAuthor = bookAuthor, bookISBN = bookISBN)
-
+# Log user out of this session
 @app.route("/logout")
 def logout():
     if session.get('username') is None:
@@ -113,3 +103,26 @@ def logout():
         session.clear()
         mainHeading = "You are logged out, now. Do you wan to log in again?"
         return render_template('index.html', mainHeading = mainHeading)
+
+
+# route to display the book details
+@app.route("/bookList", methods=["GET", "POST"])
+def bookList():
+    loggedInUserTxt = f"Logged in as: {session['username']}"
+    mainHeading = "Here are the detailed information about your book:"
+    bookTitleInput = request.form.get("bookTitle")
+    bookAuthorInput = request.form.get("bookAuthor")
+    bookISBNInput = request.form.get("bookISBN")
+
+    # --- implementiere hier Datenbankabfrage über Bücher --- #
+    #       .............................................
+    #       ............................................. 
+    # ------------------------------------------------------- #
+
+    # --- implementiere hier Visualisierung der Infos der gefundenen Bücher --- #
+    #       .............................................
+    #       ............................................. 
+    # ------------------------------------------------------- #
+
+    return render_template("bookList.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookTitle = bookTitleInput, bookAuthor = bookAuthorInput, bookISBN = bookISBNInput)
+
