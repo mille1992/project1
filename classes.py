@@ -42,10 +42,4 @@ class Book:
             bookResult = None
         elif (titleInput == True or authorInput == True or isbnInput == True): 
             bookResult = db.execute("SELECT * FROM books WHERE  title LIKE :title OR author LIKE :author OR CAST(isbn AS TEXT) LIKE :isbn",{"title": "%" + self.title + "%", "author": "%" + self.author + "%", "isbn": "%" + self.isbn + "%"})
-        #booksArr = []
-        #print(f"your search yields the following results:")
-        #for books in bookResult:
-        #    booksArr.append(books)
-        #    print(f"title: {books.title}, author: {books.author}, year of publishing: {books.year}, isbn: {books.isbn},")
-        #print(f"{booksArr}")
         return bookResult        

@@ -120,10 +120,6 @@ def bookList():
     resultedBooks = searchedBook.lookupBookInDatabase(db)
     # ------------------------------------------------------- #
 
-    # --- implementiere hier Visualisierung der Infos der gefundenen Bücher --- #
-    #       .............................................
-    #       ............................................. 
-    # ------------------------------------------------------- #
 
     if resultedBooks is None:
         mainHeading = f"Your book could not be found, please try again." # user clicks home button / enters webpage while being logged in
