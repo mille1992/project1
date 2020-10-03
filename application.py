@@ -48,9 +48,9 @@ def index():
         # welcome user, if password and username can be found
         else:
             username = username
-            mainHeading = f"Welcome, {username}!"
+            mainHeading = f"Welcome, {username}! Find your book."
             loggedInUserTxt = f"Logged in as: {username}"
-            return render_template("index.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt) 
+            return render_template("bookSearch.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt) 
     else:
         if session.get('username') == None: # user clicks home button / enters webpage without being logged in
             mainHeading = "Welcome to Bookuru! Please login."
@@ -88,7 +88,7 @@ def registration():
         user.add_userToDatabase(db)
 
         # display success message
-        mainHeading = "Your Registration was successful"
+        mainHeading = "Your Registration was successful. Please login."
         return render_template("index.html", mainHeading = mainHeading)
     else:
         mainHeading = "Please register here"
@@ -101,7 +101,7 @@ def logout():
         return redirect(url_for('index'))
     else:
         session.clear()
-        mainHeading = "You are logged out, now. Do you wan to log in again?"
+        mainHeading = "You are logged out, now. Do you want to log in again?"
         return render_template('index.html', mainHeading = mainHeading)
 
 

@@ -20,7 +20,7 @@ CREATE TABLE books (
     book_id SERIAL PRIMARY KEY,
     title VARCHAR NOT NULL,
     author VARCHAR NOT NULL,
-    isbn INTEGER NOT NULL,
+    isbn BIGINT NOT NULL,
     year INTEGER NOT NULL
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE reviews (
     rating INTEGER NOT NULL,
     review VARCHAR NOT NULL,
     review_counts INTEGER NOT NULL,
-    isbn INTEGER REFERENCES books,
+    isbn BIGINT REFERENCES books,
     user_id INTEGER REFERENCES users
 );
 

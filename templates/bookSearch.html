@@ -13,11 +13,11 @@
 
 {% block body %}    
    
-    <form class="text-center" action="{{ url_for('bookDetails')}}" method="POST">
+    <form class="text-center" action="{{ url_for('bookList')}}" method="POST">
         <input type="text" name="bookTitle" placeholder="Enter the books title">
         <input type="text" name="bookAuthor" placeholder="Enter your books author">        
         <input type="number" name="bookISBN" placeholder="Enter your books ISBN">
-        <button href="{{ url_for('bookDetails') }}">Search</button>
+        <button href="{{ url_for('bookList') }}">Search</button>
     </form>
 
 
