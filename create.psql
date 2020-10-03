@@ -4,17 +4,6 @@ CREATE TABLE users (
     password VARCHAR NOT NULL
 );
 
-DROP TABLE users;
-
-INSERT INTO users(username, password) VALUES('Michael', 'Brot');
-
-UPDATE users
-    SET username = 'Micha' WHERE username = 'Michael';
-
-DELETE FROM users WHERE username = 'Micha';
-
-
-
 
 CREATE TABLE books (
     book_id SERIAL PRIMARY KEY,
@@ -33,3 +22,17 @@ CREATE TABLE reviews (
     user_id INTEGER REFERENCES users
 );
 
+
+DROP TABLE users;
+
+INSERT INTO users(username, password) VALUES('Michael', 'Brot');
+
+UPDATE users
+    SET username = 'Micha' WHERE username = 'Michael';
+
+DELETE FROM users WHERE username = 'Micha';
+
+SELECT * FROM books; 
+SELECT MAX(book_id) FROM books;
+DELETE FROM books WHERE book_id >0;
+SELECT isbn, COUNT(*) FROM books GROUP BY isbn HAVING COUNT(*)>1;

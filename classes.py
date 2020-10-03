@@ -21,3 +21,31 @@ class Book:
         # add new book to database
         db.execute("INSERT INTO books (title, author, isbn, year) VALUES (:title,:author,:isbn,:year)",{"title": self.title, "author": self.author, "isbn": self.isbn, "year": self.year})
         db.commit()
+
+    def lookupBookInDatabase(self,db):
+        titleInput = True
+        authorInput = True
+        isbnInput = True
+
+        if self.title == "":
+            self.title = "noTitleInput"
+            titleInput = False
+        if self.author == "":
+            self.author = "noAuthorInput"
+            authorInput = False
+        if self.isbn == "":
+            self.isbn = "000000000"
+            isbnInput = False
+
+        if (titleInput == False and authorInput == False and isbnInput == False):
+            print(f"No book input. Please enter a title, author or isbn")
+            bookResult = None
+        elif (titleInput == True or authorInput == True or isbnInput == True): 
+            bookResult = db.execute("SELECT * FROM books WHERE  title LIKE :title OR author LIKE :author OR CAST(isbn AS TEXT) LIKE :isbn",{"title": "%" + self.title + "%", "author": "%" + self.author + "%", "isbn": "%" + self.isbn + "%"})
+        #booksArr = []
+        #print(f"your search yields the following results:")
+        #for books in bookResult:
+        #    booksArr.append(books)
+        #    print(f"title: {books.title}, author: {books.author}, year of publishing: {books.year}, isbn: {books.isbn},")
+        #print(f"{booksArr}")
+        return bookResult        

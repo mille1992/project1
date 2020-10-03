@@ -12,12 +12,18 @@
 {% endblock %}
 
 {% block body %}    
-    <p class="pt-2 text-center">This is your book</p>
-    <p class="pt-2 text-center"></p>
-        Book title: {{bookTitle}}
-        Book author: {{bookAuthor}}
-        Book ISBN: {{bookISBN}}
-    </p>
+    <p class="pt-2 text-center">Here are your results:</p>
+
+
+    <ul>
+        {% for books in resultedBooks %}
+            <li> 
+                title: {{ books.title }}, 
+                author: {{ books.author }}, 
+                year: {{ books.year }}
+            </li>
+        {% endfor %}
+    </ul>
 
 
 {% endblock %}

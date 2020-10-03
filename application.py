@@ -114,9 +114,10 @@ def bookList():
     bookAuthorInput = request.form.get("bookAuthor")
     bookISBNInput = request.form.get("bookISBN")
 
+
     # --- implementiere hier Datenbankabfrage über Bücher --- #
-    #       .............................................
-    #       ............................................. 
+    searchedBook = Book(bookTitleInput, bookAuthorInput, bookISBNInput, 0000, 0)
+    resultedBooks = searchedBook.lookupBookInDatabase(db)
     # ------------------------------------------------------- #
 
     # --- implementiere hier Visualisierung der Infos der gefundenen Bücher --- #
@@ -124,5 +125,10 @@ def bookList():
     #       ............................................. 
     # ------------------------------------------------------- #
 
-    return render_template("bookList.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookTitle = bookTitleInput, bookAuthor = bookAuthorInput, bookISBN = bookISBNInput)
+    if resultedBooks is None:
+        mainHeading = f"Your book could not be found, please try again." # user clicks home button / enters webpage while being logged in
+        loggedInUserTxt = f"Logged in as: {session['username']}"
+        return render_template("bookSearch.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
+    else:
+        return render_template("bookList.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, resultedBooks = resultedBooks)
 
