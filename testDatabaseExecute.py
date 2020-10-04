@@ -27,11 +27,12 @@ db = scoped_session(sessionmaker(bind=engine))
 
 
 def main():
-    bookResult = db.execute("SELECT * FROM books")
+    bookDetails = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": 8129115301})    
+    bookResult = db.execute("SELECT * FROM books WHERE book_id=1000")
     booksArr = []
-    for books in bookResult:
+    for books in bookDetails:
         booksArr.append(books)
-    print(f"{bookResult.title}")
+        print(f"{books.title}")
 
 
 

@@ -12,15 +12,14 @@
 {% endblock %}
 
 {% block body %}    
-    <p class="pt-2 text-center">Here are your results:</p>
-
-
     <ul>
         {% for books in resultedBooks %}
             <li> 
-                title: {{ books.title }}, 
-                author: {{ books.author }}, 
-                year: {{ books.year }}
+                <a href="{{ url_for('bookDetail', book_isbn = books.isbn) }}">
+                    title: {{ books.title }}, 
+                    author: {{ books.author }}, 
+                    year: {{ books.year }}
+                </a>
             </li>
         {% endfor %}
     </ul>

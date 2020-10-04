@@ -109,7 +109,7 @@ def logout():
 @app.route("/bookList", methods=["GET", "POST"])
 def bookList():
     loggedInUserTxt = f"Logged in as: {session['username']}"
-    mainHeading = "Here are the detailed information about your book:"
+    mainHeading = "Here are the books resulting from your seach:"
     bookTitleInput = request.form.get("bookTitle")
     bookAuthorInput = request.form.get("bookAuthor")
     bookISBNInput = request.form.get("bookISBN")
@@ -128,3 +128,12 @@ def bookList():
     else:
         return render_template("bookList.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, resultedBooks = resultedBooks)
 
+@app.route("/bookDetail/<int:book_isbn>")
+def bookDetail(book_isbn):
+    bookDetails = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn})    
+    bookReviews = db.execute("SELECT * FROM reviews WHERE isbn = :isbn", {"isbn": book_isbn})
+
+    mainHeading = f"Here is some more detailed info on your book:" # user clicks home button / enters webpage while being logged in
+    loggedInUserTxt = f"Logged in as: {session['username']}"
+
+    return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetails, bookReviews = bookReviews)

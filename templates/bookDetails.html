@@ -1,0 +1,35 @@
+
+{% extends "layout.html" %}
+
+{% block title %}
+    Find your book
+{% endblock %}
+
+{% block heading %}    
+    
+    {{mainHeading}}
+
+{% endblock %}
+
+{% block body %}    
+
+
+    {% for booksDet in bookDetails %}
+
+        <h3 class="text-center">{{ booksDet.title }}</h3>
+        
+     
+        <ul class="text-center">
+                <li class="text-center">
+                    author: {{ booksDet.author }}, 
+                </li>
+                <li class="text-center">
+                    year: {{ booksDet.year }}
+                </li>
+                <li class="text-center">
+                    isbn: {{ booksDet.isbn }}
+                </li>
+        </ul>
+    {% endfor %}
+
+{% endblock %}
