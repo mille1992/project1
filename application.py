@@ -24,7 +24,7 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 
 # make sure user sessions are seperated from another if happening at the same time
 db = scoped_session(sessionmaker(bind=engine))
-
+db = db()
 
 
 # Handler for Login of User
@@ -97,9 +97,10 @@ def registration():
 # Log user out of this session
 @app.route("/logout")
 def logout():
-    if session.get('username') is None:
+    # check if a user is logged in
+    if session.get('username') is None: # no user logged in
         return redirect(url_for('index'))
-    else:
+    else: # user logged in will be logged out
         session.clear()
         mainHeading = "You are logged out, now. Do you want to log in again?"
         return render_template('index.html', mainHeading = mainHeading)
@@ -110,30 +111,75 @@ def logout():
 def bookList():
     loggedInUserTxt = f"Logged in as: {session['username']}"
     mainHeading = "Here are the books resulting from your seach:"
+    
+    # get bookdetails that were searched
     bookTitleInput = request.form.get("bookTitle")
     bookAuthorInput = request.form.get("bookAuthor")
     bookISBNInput = request.form.get("bookISBN")
 
 
-    # --- implementiere hier Datenbankabfrage über Bücher --- #
+    # look for book by using function from the Book object
     searchedBook = Book(bookTitleInput, bookAuthorInput, bookISBNInput, 0000, 0)
     resultedBooks = searchedBook.lookupBookInDatabase(db)
-    # ------------------------------------------------------- #
 
-
-    if resultedBooks is None:
-        mainHeading = f"Your book could not be found, please try again." # user clicks home button / enters webpage while being logged in
-        loggedInUserTxt = f"Logged in as: {session['username']}"
+    if resultedBooks is None: # no book could be found
+        mainHeading = f"Your book could not be found, please try again." 
         return render_template("bookSearch.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
-    else:
+    else: # at least one book could be found -> display list of found books
         return render_template("bookList.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, resultedBooks = resultedBooks)
 
-@app.route("/bookDetail/<int:book_isbn>")
+@app.route("/bookDetail/<int:book_isbn>", methods=["GET", "POST"])
 def bookDetail(book_isbn):
-    bookDetails = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn})    
-    bookReviews = db.execute("SELECT * FROM reviews WHERE isbn = :isbn", {"isbn": book_isbn})
+    # when accessing bookDetails.html after clicking on a specific book 
+    if request.method == "GET": 
+        mainHeading = f"Here is some more detailed info on your book:"
+        loggedInUserTxt = f"Logged in as: {session['username']}"
+        
+        # look up isbn number in books db
+        bookDetails = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn})    
+        # ++++++++++ INFO ++++++++++++
+        # When accessing the following for-loop the content of bookDetails disappears 
+        # because the SQL object gets discarded after all rows have been accessed
+        # ++++++++++++++++++++++++++++
+        for book_cnt in bookDetails:
+            bookDetail = book_cnt
+        book_id = bookDetail.book_id
 
-    mainHeading = f"Here is some more detailed info on your book:" # user clicks home button / enters webpage while being logged in
-    loggedInUserTxt = f"Logged in as: {session['username']}"
+        bookReviews = db.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id})
 
-    return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetails, bookReviews = bookReviews)
+
+
+        return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews)
+
+    # when accessing bookDetails.html after submitting a review
+    if request.method == "POST": #when accessing bookDetails.html after reviewing
+        mainHeading = f"Here is some more detailed info on your book:"
+        loggedInUserTxt = f"Logged in as: {session['username']}"
+        username = session['username']
+        userList = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}) 
+        
+        for user_cnt in userList:
+            user = user_cnt
+
+        user_id = user.user_id
+        print(f"{user_id}")
+        # look up isbn number in books db
+        bookDetails = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn})    
+        # ++++++++++ INFO ++++++++++++
+        # When accessing the following for-loop the content of bookDetails disappears 
+        # because the SQL object gets discarded after all rows have been accessed
+        # ++++++++++++++++++++++++++++
+        for book_cnt in bookDetails:
+            bookDetail = book_cnt
+        book_id = bookDetail.book_id
+
+
+        reviewTxt = request.form.get("review")
+        reviewRating = request.form.get("rating")
+        db.execute("INSERT INTO reviews (rating, review, book_id, submitting_user) VALUES (:rating, :review, :book_id, :submitting_user)",{"rating": reviewRating, "review": reviewTxt, "book_id": book_id, "submitting_user": user_id})
+
+        bookReviews = db.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id})
+
+
+
+        return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews)

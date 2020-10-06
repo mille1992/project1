@@ -1,35 +1,59 @@
-
 {% extends "layout.html" %}
 
 {% block title %}
     Find your book
 {% endblock %}
 
-{% block heading %}    
-    
-    {{mainHeading}}
+{% block heading %}
+
+{{mainHeading}}
 
 {% endblock %}
 
-{% block body %}    
+{% block body %}
 
 
-    {% for booksDet in bookDetails %}
 
-        <h3 class="text-center">{{ booksDet.title }}</h3>
-        
-     
-        <ul class="text-center">
-                <li class="text-center">
-                    author: {{ booksDet.author }}, 
-                </li>
-                <li class="text-center">
-                    year: {{ booksDet.year }}
-                </li>
-                <li class="text-center">
-                    isbn: {{ booksDet.isbn }}
-                </li>
-        </ul>
-    {% endfor %}
+    <ul style="background-color: black;">
+        <div class="ml-2 list-group-item">
+            <h3>{{ bookDetails.title }}</h3>
+
+            <li class="ml-4">
+                Author: {{ bookDetails.author }},
+            </li>
+            <li class="ml-4">
+                Publication year: {{ bookDetails.year }}
+            </li>
+            <li class="ml-4">
+                ISBN: {{ bookDetails.isbn }}
+            </li>
+            <p class="mt-4 text-dark"> Please leave a review:</p>
+            <form class="" action="{{ url_for('bookDetail', book_isbn = bookDetails.isbn)}}" method="POST">
+                <input type="text" name="review" placeholder="Enter your review comment here">
+                <input type="number" name="rating" placeholder="Enter a rating here">
+                <button href="{{ url_for('bookDetail', book_isbn = bookDetails.isbn) }}">Submit</button>
+            </form>
+        </div>
+    </ul>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rating</th>
+                <th>Review Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booksRev in bookReviews %}  
+            <tr>
+                <td>Rating: {{ booksRev.rating }}</td>
+                <td>Review: {{ booksRev.review }}</td>
+            </tr>
+            {% endfor %}          
+        </tbody>
+    </table>
+
+
 
 {% endblock %}
