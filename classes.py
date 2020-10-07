@@ -42,5 +42,4 @@ class Book:
             bookResult = None
         elif (titleInput == True or authorInput == True or isbnInput == True): 
             bookResult = db.execute("SELECT * FROM books WHERE  title LIKE :title OR author LIKE :author OR CAST(isbn AS TEXT) LIKE :isbn",{"title": "%" + self.title + "%", "author": "%" + self.author + "%", "isbn": "%" + self.isbn + "%"})
-        
         return bookResult        

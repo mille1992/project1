@@ -30,7 +30,7 @@
             <p class="mt-4 text-dark"> Please leave a review:</p>
             <form class="" action="{{ url_for('bookDetail', book_isbn = bookDetails.isbn)}}" method="POST">
                 <input type="text" name="review" placeholder="Enter your review comment here">
-                <input type="number" name="rating" placeholder="Enter a rating here">
+                <input type="number" name="rating" min="1" max="5" placeholder="Enter a rating here">
                 <button href="{{ url_for('bookDetail', book_isbn = bookDetails.isbn) }}">Submit</button>
             </form>
         </div>

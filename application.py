@@ -121,9 +121,14 @@ def bookList():
     # look for book by using function from the Book object
     searchedBook = Book(bookTitleInput, bookAuthorInput, bookISBNInput, 0000, 0)
     resultedBooks = searchedBook.lookupBookInDatabase(db)
+    contentCheck_resultedBooks = resultedBooks.rowcount
 
-    if resultedBooks is None: # no book could be found
-        mainHeading = f"Your book could not be found, please try again." 
+
+    if resultedBooks is None: # no search argument was handed over
+        mainHeading = f"You did not put in any search arguments, please try again." 
+        return render_template("bookSearch.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
+    elif contentCheck_resultedBooks == 0:
+        mainHeading = f"We could not find that book, please try again." 
         return render_template("bookSearch.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt)
     else: # at least one book could be found -> display list of found books
         return render_template("bookList.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, resultedBooks = resultedBooks)
@@ -155,15 +160,15 @@ def bookDetail(book_isbn):
     if request.method == "POST": #when accessing bookDetails.html after reviewing
         mainHeading = f"Here is some more detailed info on your book:"
         loggedInUserTxt = f"Logged in as: {session['username']}"
+        
+        # Find out user_id
         username = session['username']
         userList = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}) 
-        
         for user_cnt in userList:
             user = user_cnt
-
         user_id = user.user_id
-        print(f"{user_id}")
-        # look up isbn number in books db
+
+        # look up isbn number in books db in order to find book_id
         bookDetails = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn})    
         # ++++++++++ INFO ++++++++++++
         # When accessing the following for-loop the content of bookDetails disappears 
@@ -173,13 +178,21 @@ def bookDetail(book_isbn):
             bookDetail = book_cnt
         book_id = bookDetail.book_id
 
-
+        # get review comment and rating from the posted review 
         reviewTxt = request.form.get("review")
         reviewRating = request.form.get("rating")
-        db.execute("INSERT INTO reviews (rating, review, book_id, submitting_user) VALUES (:rating, :review, :book_id, :submitting_user)",{"rating": reviewRating, "review": reviewTxt, "book_id": book_id, "submitting_user": user_id})
+
+        # insert review into database
+        # check whether book was already reviewed by this user
+        if db.execute("SELECT * FROM reviews WHERE book_id = :book_id AND submitting_user = :submitting_user", {"book_id": book_id, "submitting_user": user_id}).rowcount > 0:
+            mainHeading = f"This book was already reviewed by you, we therefore did not add another review. Thanks for your participation!"
+        else:
+            db.execute("INSERT INTO reviews (rating, review, book_id, submitting_user) VALUES (:rating, :review, :book_id, :submitting_user)",{"rating": reviewRating, "review": reviewTxt, "book_id": book_id, "submitting_user": user_id})
+        
+
 
         bookReviews = db.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id})
 
 
-
+        db.commit()
         return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews)
