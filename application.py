@@ -1,5 +1,6 @@
 import os
 import sys
+import requests 
 
 from flask import Flask, session, render_template, request, redirect, url_for
 from flask_session import Session
@@ -116,7 +117,7 @@ def bookList():
     bookTitleInput = request.form.get("bookTitle")
     bookAuthorInput = request.form.get("bookAuthor")
     bookISBNInput = request.form.get("bookISBN")
-
+    print(f"{bookTitleInput} {bookAuthorInput} {bookISBNInput}")
 
     # look for book by using function from the Book object
     searchedBook = Book(bookTitleInput, bookAuthorInput, bookISBNInput, 0000, 0)
@@ -135,6 +136,7 @@ def bookList():
 
 @app.route("/bookDetail/<int:book_isbn>", methods=["GET", "POST"])
 def bookDetail(book_isbn):
+    checkBookInGRavl = False
     # when accessing bookDetails.html after clicking on a specific book 
     if request.method == "GET": 
         mainHeading = f"Here is some more detailed info on your book:"
@@ -151,10 +153,20 @@ def bookDetail(book_isbn):
         book_id = bookDetail.book_id
 
         bookReviews = db.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id})
+       
+        # look up average rating and number of reviews via review_counts on GoodReads via API
+        res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": os.getenv("GOODREADSKEY"), "isbns": book_isbn})
+        
 
+        if res.status_code == 200:
+            checkBookInGRavl = True
+            statisticsGR = res.json()
+        else: 
+            statisticsGR = []
 
+        db.commit()
 
-        return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews)
+        return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews, checkBookInGRavl = checkBookInGRavl, statisticsGR = statisticsGR)
 
     # when accessing bookDetails.html after submitting a review
     if request.method == "POST": #when accessing bookDetails.html after reviewing
@@ -190,9 +202,22 @@ def bookDetail(book_isbn):
             db.execute("INSERT INTO reviews (rating, review, book_id, submitting_user) VALUES (:rating, :review, :book_id, :submitting_user)",{"rating": reviewRating, "review": reviewTxt, "book_id": book_id, "submitting_user": user_id})
         
 
-
+        # look up all reviews and save them in bookReviews (SQLAlchemy ResponseObject)
         bookReviews = db.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id})
 
+        # look up average rating and number of reviews via review_counts on GoodReads via API
+        res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": os.getenv("GOODREADSKEY"), "isbns": book_isbn})
+        
 
+        if res.status_code == 200:
+            checkBookInGRavl = True
+            statisticsGR = res.json()
+        else: 
+            statisticsGR = []
+  
+        
+
+        
         db.commit()
-        return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews)
+
+        return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews, checkBookInGRavl = checkBookInGRavl, statisticsGR = statisticsGR)

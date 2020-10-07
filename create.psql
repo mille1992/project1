@@ -17,9 +17,8 @@ CREATE TABLE reviews (
     review_id SERIAL PRIMARY KEY,
     rating INTEGER NOT NULL,
     review VARCHAR NOT NULL,
-    review_counts INTEGER NOT NULL,
-    isbn BIGINT REFERENCES books,
-    user_id INTEGER REFERENCES users
+    book_id BIGINT REFERENCES books,
+    submitting_user INTEGER REFERENCES users
 );
 
 

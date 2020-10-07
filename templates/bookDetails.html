@@ -27,7 +27,11 @@
             <li class="ml-4">
                 ISBN: {{ bookDetails.isbn }}
             </li>
-            <p class="mt-4 text-dark"> Please leave a review:</p>
+            {% if checkBookInGRavl == True%}
+                <b>Rating on GoodReads:</b> {{ statisticsGR["books"][0]["average_rating"] }}
+                <b>Number of Ratings on GoodReads:</b> {{ statisticsGR["books"][0]["reviews_count"] }}          
+            {% endif %}
+            <p class="mt-4 text-dark"> Please leave a review on Bookuru:</p>
             <form class="" action="{{ url_for('bookDetail', book_isbn = bookDetails.isbn)}}" method="POST">
                 <input type="text" name="review" placeholder="Enter your review comment here">
                 <input type="number" name="rating" min="1" max="5" placeholder="Enter a rating here">
