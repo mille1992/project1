@@ -2,7 +2,7 @@ import os
 import sys
 import requests 
 
-from flask import Flask, session, render_template, request, redirect, url_for
+from flask import Flask, session, render_template, request, redirect, url_for, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -18,6 +18,7 @@ if not os.getenv("DATABASE_URL"):
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['JSON_SORT_KEYS'] = False
 Session(app)
 
 # Set up database on heroku
@@ -207,17 +208,59 @@ def bookDetail(book_isbn):
 
         # look up average rating and number of reviews via review_counts on GoodReads via API
         res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": os.getenv("GOODREADSKEY"), "isbns": book_isbn})
-        
-
         if res.status_code == 200:
             checkBookInGRavl = True
             statisticsGR = res.json()
         else: 
             statisticsGR = []
-  
-        
 
-        
         db.commit()
-
         return render_template("bookDetails.html", mainHeading = mainHeading, loggedInUserTxt = loggedInUserTxt, bookDetails = bookDetail, bookReviews = bookReviews, checkBookInGRavl = checkBookInGRavl, statisticsGR = statisticsGR)
+
+
+@app.route("/api/<int:isbn>", methods=["GET"])
+def api(isbn):
+
+    bookTitle = "titleDummy"
+    bookAuthor = "authorDummy"
+    bookIsbn = 00000000
+    bookYear = 0000
+    bookRevCnt = 0
+    avgRating = 0
+
+    # Make sure isbn exists
+    #book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": isbn})
+    book = db.execute("SELECT * FROM reviews RIGHT JOIN books ON (reviews.book_id = books.book_id) WHERE isbn = :isbn", {"isbn": isbn})
+    
+    contentCheck_book = book.rowcount
+    if contentCheck_book == 0:
+        return jsonify({"error": "ISBN not found"}),404
+
+    rating_sum = 0
+    review_cnt = 0
+    for book_info_cnt in book:
+        book_info = book_info_cnt
+        print({book_info_cnt.rating})
+        if book_info_cnt.rating is not None:
+            review_cnt = review_cnt + 1
+            rating_sum = rating_sum + book_info_cnt.rating 
+
+    bookAuthor = book_info.author
+    bookTitle = book_info.title
+    bookIsbn = book_info.isbn
+    bookYear = book_info.year
+    bookRevCnt = review_cnt
+    if rating_sum != 0 and review_cnt != 0:
+        avgRating = rating_sum / review_cnt
+    else:
+        avgRating = "No Rating yet"
+    
+    return jsonify({
+        "title": bookTitle,
+        "author": bookAuthor,
+        "publication_year": bookYear,
+        "review_count": bookRevCnt,
+        "average_rating": avgRating
+        "isbn": bookIsbn,
+    })
+
